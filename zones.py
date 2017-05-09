@@ -5,7 +5,7 @@ sys.path.append('/Users/pawnoutlet/Documents/fdfault/data')
 import fdfault
 #import seistools.coulomb
 import seistools.coulomb
-#import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 
 # defining some parameters to use it later
 
@@ -20,14 +20,19 @@ coloumbs_stress_time_step= 16                       # Time step at which stresse
 
 
               # Since fault is at 20 km so I am taking 5 km distance on both sides
-distance_start= 20000                 
+#distance_start= 20000                 
+distance_start= 15000
+distance_end= 20000  
 space_interval=50
-index_y_start= int(distance_start/space_interval)-10    # 10 grid points away from the fault 
-range_of_iter= 1
+#index_y_start= int(distance_start/space_interval)-10    # 10 grid points away from the fault 
+index_y_start= int(distance_start/space_interval)
+index_y_end= int(distance_end/space_interval)-10
+range_of_iter=index_y_end-index_y_start +1
+#range_of_iter= 1
 total_dim_x = 801
 
 
-cff_w_distanc1 = np.zeros(( number_of_realization, total_dim_x) )   
+#cff_w_distanc1 = np.zeros(( number_of_realization, total_dim_x) )   
 
 string= 'sxxbody.' +'sxx'+'.shape[0]'   # to find the time step 
 
@@ -36,10 +41,10 @@ string= 'sxxbody.' +'sxx'+'.shape[0]'   # to find the time step
 
 start_x= 400
 
-positive_zones= np.zeros((number_of_realization))
-negative_zones=np.zeros((number_of_realization))
-each_pos_zone_len= np.zeros((number_of_realization, 50))
-each_neg_zone_len= np.zeros((number_of_realization, 50))
+positive_zones= np.zeros((range_of_iter, number_of_realization))
+negative_zones=np.zeros((range_of_iter,  number_of_realization))
+each_pos_zone_len= np.zeros((number_of_realization, range_of_iter, 50))
+each_neg_zone_len= np.zeros((number_of_realization, range_of_iter, 50))
 
 
 for kk in range(number_of_realization):
@@ -61,21 +66,21 @@ for kk in range(number_of_realization):
 	# coulomb_min= c_stress.max()
 	
 #	print(c_stress.shape
-#	for dim_y in range(range_of_iter):	
+	for dim_y in range(range_of_iter):	
 		for dim_x in range(total_dim_x):
 
-			if c_stress[start_x+ dim_x, index_y_start]>= 0 and c_stress[start_x+ dim_x+1, index_y_start] < 0 :
+			if c_stress[start_x+ dim_x, index_y_start + dim_y ]>= 0 and c_stress[start_x+ dim_x+1, index_y_start + dim_y ] < 0 :
 									
-					if  c_stress[start_x+ dim_x+2, index_y_start] <0  and c_stress[start_x+ dim_x+3, index_y_start] <0 and c_stress[start_x+ dim_x+4, index_y_start]<0 and c_stress[start_x+ dim_x+5, index_y_start] <0 and c_stress[start_x+ dim_x+6, index_y_start] <0 and c_stress[start_x+ dim_x+7, index_y_start] <0 and c_stress[start_x+ dim_x+8, index_y_start] and c_stress[start_x+ dim_x+9, index_y_start] and c_stress[start_x+ dim_x+10, index_y_start] <0:
+					if  c_stress[start_x+ dim_x+2, index_y_start + dim_y] <0  and c_stress[start_x+ dim_x+3, index_y_start + dim_y] <0 and c_stress[start_x+ dim_x+4, index_y_start+ dim_y]<0 and c_stress[start_x+ dim_x+5, index_y_start + dim_y] <0 and c_stress[start_x+ dim_x+6, index_y_start + dim_y] <0 and c_stress[start_x+ dim_x+7, index_y_start + dim_y] <0 and c_stress[start_x+ dim_x+8, index_y_start + dim_y] and c_stress[start_x+ dim_x+9, index_y_start + dim_y] and c_stress[start_x+ dim_x+10, index_y_start + dim_y] <0:
 
-						negative_zones[kk] = negative_zones[kk] +1
+						negative_zones[dim_y, kk] = negative_zones[dim_y, kk] +1
 						
 						neg_zone= 0
 						for runs in range (100):
-							if c_stress [start_x+ dim_x+1+runs , index_y_start] < 0:
+							if c_stress [start_x+ dim_x+1+runs , index_y_start + dim_y] < 0:
 								neg_zone= neg_zone +1
 								neg_zone_len= neg_zone * 50.
-								each_neg_zone_len[kk, int( negative_zones[kk]-1 )] = neg_zone_len
+								each_neg_zone_len[kk, dim_y ,int( negative_zones[dim_y,kk]-1 )] = neg_zone_len
 
 							else:
 								break	
@@ -85,24 +90,37 @@ for kk in range(number_of_realization):
 
 
 
-			if c_stress[start_x+ dim_x, index_y_start]< 0 and c_stress[start_x+ dim_x+1, index_y_start] >= 0 :
+			if c_stress[start_x+ dim_x, index_y_start + dim_y]< 0 and c_stress[start_x+ dim_x+1, index_y_start + dim_y] >= 0 :
 									
-					if  c_stress[start_x+ dim_x+2, index_y_start] >=0  and c_stress[start_x+ dim_x+3, index_y_start] >=0 and c_stress[start_x+ dim_x+4, index_y_start] >=0 and c_stress[start_x+ dim_x+5, index_y_start] >=0 and c_stress[start_x+ dim_x+6, index_y_start] >=0 and c_stress[start_x+ dim_x+7, index_y_start] >=0 and c_stress[start_x+ dim_x+8, index_y_start] >=0 and c_stress[start_x+ dim_x+9, index_y_start] >=0 and c_stress[start_x+ dim_x+10, index_y_start] >=0:
+					if  c_stress[start_x+ dim_x+2, index_y_start + dim_y] >=0  and c_stress[start_x+ dim_x+3, index_y_start + dim_y] >=0 and c_stress[start_x+ dim_x+4, index_y_start + dim_y] >=0 and c_stress[start_x+ dim_x+5, index_y_start + dim_y] >=0 and c_stress[start_x+ dim_x+6, index_y_start + dim_y] >=0 and c_stress[start_x+ dim_x+7, index_y_start + dim_y] >=0 and c_stress[start_x+ dim_x+8, index_y_start + dim_y] >=0 and c_stress[start_x+ dim_x+9, index_y_start + dim_y] >=0 and c_stress[start_x+ dim_x+10, index_y_start + dim_y] >=0:
 			
-						positive_zones[kk] = positive_zones[kk] +1
+						positive_zones[dim_y, kk] = positive_zones[dim_y, kk] +1
 
 						pos_zone= 0
 						for runs in range (100):
-							if c_stress [start_x+ dim_x+1+runs , index_y_start] > 0:
+							if c_stress [start_x+ dim_x+1+runs , index_y_start + dim_y] > 0:
 								pos_zone= pos_zone +1
 								pos_zone_len= pos_zone * 50.
-								each_pos_zone_len[kk, int( positive_zones[kk]-1 )] = pos_zone_len
+								each_pos_zone_len[kk,dim_y ,int( positive_zones[dim_y, kk]-1 )] = pos_zone_len
 							else:
 								break			
 															
 
 
 
+print(negative_zones[range_of_iter-1,:])
+print( each_neg_zone_len[0, range_of_iter-1 , :] )
+
+
+
+
+#plt.hist(positive_zones[0, :], bins= 15, facecolor='yellow', edgecolor='gray', label='Positive zones')
+#plt.hist(negative_zones[0, :], bins= 15, facecolor='red', edgecolor='gray', label='negative zones')
+#plt.xlabel(' # of zones')
+#plt.ylabel('# per bin')
+#plt.title('Pdf of stress zones', fontsize=16,color='black')
+#plt.legend( loc='upper right')
+#plt.show()
 
 #print(cff_full.shape)
 #print(cff_w_distanc1.shape)
