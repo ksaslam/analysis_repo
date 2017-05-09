@@ -61,7 +61,7 @@ for kk in range(number_of_realization):
 	# coulomb_min= c_stress.max()
 	
 #	print(c_stress.shape
-	for dim_y in range(range_of_iter):	
+#	for dim_y in range(range_of_iter):	
 		for dim_x in range(total_dim_x):
 
 			if c_stress[start_x+ dim_x, index_y_start]>= 0 and c_stress[start_x+ dim_x+1, index_y_start] < 0 :
