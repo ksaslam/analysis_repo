@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 # defining some parameters to use it later
 
 prob_name= 'seed'              # parameters related to problem
-number_of_realization=1
+number_of_realization=2
 
 receiver_fault_orientation= np.array([0,1])    # parameters related to coloumb stress
 mu=0.4
@@ -72,17 +72,54 @@ for kk in range(number_of_realization):
 	fault_dimension= np.linspace(0,80., vfault.V.shape[1])
 	rupt_indx= vfault.V.argmax(axis=1)
 	rupt_slip_rate= vfault.V.max(axis=1)
-	print(rupt_slip_rate)
-	
-	if  rupt_slip_rate[coloumbs_stress_time_step]   >= 10.0:
-		rupture_length[kk]= fault_dimension [  rupt_indx[coloumbs_stress_time_step]  ]-  fault_dimension [ rupt_indx[0] ]
+
+
+	rupt_slip_test= vfault.V[coloumbs_stress_time_step, :]   # store all the values in this array
+	print(rupt_slip_test.shape, 'the shape of new array')
+	max_slip_side1= np.max(rupt_slip_test[rupt_indx[0] :vfault.V.shape[1] ])
+	max_slip_side2= np.max(rupt_slip_test[0: rupt_indx[0]  ])
+	indx_max_slip_side1 = np.where(rupt_slip_test== max_slip_side1)
+	print('max slip', max_slip_side1, max_slip_side2, indx_max_slip_side1)
+
+	if  max_slip_side1>= 10.0:
+		indx_max_slip_side1 = np.where(max_slip_side1)
 	else:
 		for runs in range (coloumbs_stress_time_step-3):
-			if rupt_slip_rate [coloumbs_stress_time_step- 1- runs]   >= 10.0:
-				rupture_length[kk]= fault_dimension [  rupt_indx[coloumbs_stress_time_step-1- runs]  ]-  fault_dimension [ rupt_indx[0] ]
+		
+			rupt_slip_test= vfault.V[coloumbs_stress_time_step- 1- runs, :]
+			max_slip_side1= np.max(rupt_slip_test[rupt_indx[0] :vfault.V.shape[1] ])
+			if  max_slip_side1>= 10.0:
+				indx_max_slip_side1 = np.where(rupt_slip_test== max_slip_side1)
 				break
 			else:
-				rupture_length[kk] =0
+			 	indx_max_slip_side1 = 	rupt_indx[0]	
+
+	if  max_slip_side2>= 10.0:
+		indx_max_slip_side2 = np.where(max_slip_side2)
+	else:
+		for runs in range (coloumbs_stress_time_step-3):
+		
+			rupt_slip_test= vfault.V[coloumbs_stress_time_step- 1- runs, :]
+			max_slip_side2= np.max(rupt_slip_test[0:rupt_indx[0] ])
+			if  max_slip_side2>= 10.0:
+				indx_max_slip_side2 = np.where(rupt_slip_test== max_slip_side2)
+				break
+			else:
+			 	indx_max_slip_side2 = 	rupt_indx[0]		
+
+	rupture_length[kk] = fault_dimension[indx_max_slip_side1] - fault_dimension [indx_max_slip_side2]
+	print('rupture length', rupture_length)
+	#print('max slip', max_slip_side1, max_slip_side2)
+
+	# if  rupt_slip_rate[coloumbs_stress_time_step]   >= 10.0:
+	# 	rupture_length[kk]= fault_dimension [  rupt_indx[coloumbs_stress_time_step]  ]-  fault_dimension [ rupt_indx[0] ]
+	# else:
+	# 	for runs in range (coloumbs_stress_time_step-3):
+	# 		if rupt_slip_rate [coloumbs_stress_time_step- 1- runs]   >= 10.0:
+	# 			rupture_length[kk]= fault_dimension [  rupt_indx[coloumbs_stress_time_step-1- runs]  ]-  fault_dimension [ rupt_indx[0] ]
+	# 			break
+	# 		else:
+	# 			rupture_length[kk] =0
 					
 
 	
