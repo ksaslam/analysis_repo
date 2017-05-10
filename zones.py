@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 # defining some parameters to use it later
 
 prob_name= 'seed'              # parameters related to problem
-number_of_realization=1
+number_of_realization=2
 
 receiver_fault_orientation= np.array([0,1])    # parameters related to coloumb stress
 mu=0.4
@@ -31,6 +31,8 @@ range_of_iter=index_y_end-index_y_start +1
 #range_of_iter= 1
 total_dim_x = 801
 
+distance_array= np.linspace( 5000, 500, range_of_iter )
+print(distance_array) 
 
 #cff_w_distanc1 = np.zeros(( number_of_realization, total_dim_x) )   
 
@@ -110,8 +112,22 @@ for kk in range(number_of_realization):
 
 print(negative_zones[range_of_iter-1,:])
 print( each_neg_zone_len[0, range_of_iter-1 , :] )
+print(each_neg_zone_len.shape)
 
 
+full_pos_len_zone_matrix=np.zeros((range_of_iter, number_of_realization*50 +1 ) )
+for jj in range( range_of_iter):
+	b= np.zeros((1))
+	for ii in range (number_of_realization):
+		a= each_pos_zone_len[ii, jj, :]
+		b= np.concatenate([a, b])             # this is just to concatenate all the values b, a are dummy
+	full_pos_len_zone_matrix[jj, :]= b	
+
+plt.plot(distance_array, full_pos_len_zone_matrix[:, :], 'o')
+#plt.axis([-1, 5, -30, 30])
+plt.show()
+
+#print(a.shape, b.shape, 'these are shapes of all ')	
 
 
 #plt.hist(positive_zones[0, :], bins= 15, facecolor='yellow', edgecolor='gray', label='Positive zones')
